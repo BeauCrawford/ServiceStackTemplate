@@ -3,6 +3,7 @@ using Autofac;
 using Funq;
 using ServiceStack;
 using ServiceStack.Text;
+using ServiceStack.Web;
 
 namespace ServiceStackTemplate.Web
 {
@@ -38,14 +39,26 @@ namespace ServiceStackTemplate.Web
 			ConfigureContainer(container);
 		}
 
+		private Funq.Container _container;
+
 		private void ConfigureContainer(Funq.Container container)
 		{
+			_container = container;
+
 			var builder = new ContainerBuilder();
 			builder.RegisterModule(new SimpleModule());
 			var autofacContainerRoot = builder.Build();
 
 			container.Register<ILifetimeScope>(c => autofacContainerRoot.BeginLifetimeScope()).ReusedWithin(ReuseScope.Request);
 			container.Adapter = new AutofacContainerAdapter(container);
+		}
+
+		public override void OnEndRequest(IRequest request = null)
+		{
+			var currentContainer = _container.Resolve<ILifetimeScope>();
+			currentContainer.Dispose();
+
+			base.OnEndRequest();
 		}
 	}
 }
