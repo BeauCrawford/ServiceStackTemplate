@@ -22,6 +22,8 @@ namespace ServiceStackTemplate.Web.Services.Example
 
 		public object Get(ExampleRequest request)
 		{
+			Guard.ArgumentIsNotNull(request, "request");
+
 			if (request.IgnoreCache)
 			{
 				return CreateResponse(request);
@@ -55,5 +57,4 @@ namespace ServiceStackTemplate.Web.Services.Example
 			};
 		}
 	}
-
 }
